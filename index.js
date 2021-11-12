@@ -28,7 +28,10 @@ async function run() {
     const productsCollection = database.collection("products");
     // order seperate collection
     const ordersCollection = database.collection("orders");
-
+    //Review Collection
+    const reviewCollection = database.collection("review");
+    //User Collection
+    const usersCollection = database.collection("users");
     //POst APi
     app.post("/addProduct", async (req, res) => {
       const result = await productsCollection.insertOne(req.body);
@@ -56,6 +59,11 @@ async function run() {
       const result = await ordersCollection.insertOne(req.body);
       res.send(result);
     });
+    //All Orders
+    app.get("/allOrders", async (req, res) => {
+      const result = await ordersCollection.find({}).toArray();
+      res.send(result);
+    });
     //My Orders
     app.get("/myOrders/:email", async (req, res) => {
       const result = await ordersCollection
@@ -70,6 +78,59 @@ async function run() {
       });
       res.send(result);
     });
+    //Get Reivew
+    app.post("/review", async (req, res) => {
+      const result = await reviewCollection.insertOne(req.body);
+      res.send(result);
+    });
+    // Review Api
+    app.get("/ReciveReview", async (req, res) => {
+      const result = await reviewCollection.find({}).toArray();
+
+      res.send(result);
+    });
+    // User Info Send
+    app.post("/addUserInfo", async (req, res) => {
+      const result = await usersCollection.insertOne(req.body);
+      res.send(result);
+      console.log(result);
+    });
+    //Check user
+    // app.put("/addUserInfo", async (req, res) => {
+    //   const user = req.body;
+    //   const filter = { email: user.email };
+    //   const options = { upsert: true };
+    //   const updateDoc = { $set: user };
+    //   const result = await usersCollection.updateOne(
+    //    filter,
+    //    updateDoc,
+    //    options
+    //  );
+    //  res.send(result);
+    //});
+
+    //Make Admin Admin
+    app.put(`/users/admin`, async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    //Check Admin
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (result?.role === "admin") {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+    });
+
+    //
   } finally {
     // await client.close();
   }
