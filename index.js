@@ -78,6 +78,20 @@ async function run() {
       });
       res.send(result);
     });
+    //Delete Order Admin
+    app.delete("/deleteManageOrder/:id", async (req, res) => {
+      const result = await ordersCollection.deleteOne({
+        _id: ObjectId(req.params.id),
+      });
+      res.send(result);
+    });
+    //Delete Product Admin
+    app.delete("/deleteManageProduct/:id", async (req, res) => {
+      const result = await productsCollection.deleteOne({
+        _id: ObjectId(req.params.id),
+      });
+      res.send(result);
+    });
     //Get Reivew
     app.post("/review", async (req, res) => {
       const result = await reviewCollection.insertOne(req.body);
@@ -95,6 +109,21 @@ async function run() {
       res.send(result);
       console.log(result);
     });
+
+    //Update Status
+    app.put(`OrderStatus/:id`, async (req, res) => {
+      console(res);
+      const id = req.params.id;
+      const updateStatus = req.body.status;
+      console.log(id, updateStatus);
+      const filter = { id: ObjectId(id) };
+      const result = await ordersCollection
+        .updateOne(filter, {
+          $set: { status: updateStatus },
+        })
+        .then((res) => console.log(res));
+    });
+
     //Check user
     // app.put("/addUserInfo", async (req, res) => {
     //   const user = req.body;
